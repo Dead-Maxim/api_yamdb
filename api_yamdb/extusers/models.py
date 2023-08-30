@@ -7,7 +7,7 @@ class CustomUser(AbstractUser):
     class Roles(models.TextChoices):
         USER = 'user', _('User')
         MODERATOR = 'moderator', _('Moderator')
-        JUNIOR = 'admin', _('Admin')
+        ADMIN = 'admin', _('Admin')
 
     bio = models.TextField('Биография', blank=True)
     role = models.CharField(
