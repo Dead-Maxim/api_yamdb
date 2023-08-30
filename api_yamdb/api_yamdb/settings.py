@@ -104,3 +104,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 AUTH_USER_MODEL = 'users.MyUser'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
