@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class MyUser(AbstractUser):
+class CustomUser(AbstractUser):
     class Roles(models.TextChoices):
         USER = 'user', _('User')
         MODERATOR = 'moderator', _('Moderator')

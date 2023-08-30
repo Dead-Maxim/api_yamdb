@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import MyUser
+from .models import CustomUser
 
 
 UserAdmin.fieldsets += (
@@ -12,4 +12,4 @@ UserAdmin.fieldsets += (
         }
     ),
 )
-admin.site.register(MyUser, UserAdmin)
+admin.site.register(CustomUser, UserAdmin)
