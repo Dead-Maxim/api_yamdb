@@ -20,7 +20,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
     path(
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),
@@ -32,4 +31,5 @@ urlpatterns = [
          name='schema-swagger-ui'),
     path('redoc_d/', schema_view.with_ui('redoc', cache_timeout=0),
          name='schema-redoc'),
+    path('', include('api.urls')),
 ]
