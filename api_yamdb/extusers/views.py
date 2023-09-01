@@ -1,5 +1,10 @@
+import uuid
+
 from django.contrib.auth import get_user_model
-from rest_framework import filters, pagination, permissions, viewsets
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import permissions, status, viewsets
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
 
 from .serializers import SignupSerializer, TokenSerializer
 
@@ -7,24 +12,35 @@ from .serializers import SignupSerializer, TokenSerializer
 User = get_user_model()
 
 
-class SignupViewSet(viewsets.ModelViewSet):
-    # permission_classes = [
-    #     permissions.AllowAny,
-    # ]
-    queryset = User.objects.all()
+class PatchAsCreateViewSet(viewsets.GenericViewSet):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
+
+
+class SignupViewSet(PatchAsCreateViewSet):
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+    # queryset = User.objects.all()
     serializer_class = SignupSerializer
 
     def get_queryset(self):
-        user = User.objects.get(username=self.request.user.id)
-        # user = get_object_or_404(models.User, pk=self.request.user.pk)
-        return user.follow_users.all()
-
-    def perform_create(self, serializer):
-        serializer.save(
-            user=self.request.user
-        )
+        return None
 
 
-class TokenViewSet(viewsets.ModelViewSet):
+class TokenViewSet(PatchAsCreateViewSet):
     queryset = User.objects.all()
     serializer_class = TokenSerializer

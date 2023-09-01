@@ -9,6 +9,10 @@ class CustomUser(AbstractUser):
         MODERATOR = 'moderator', _('Moderator')
         ADMIN = 'admin', _('Admin')
 
+    email = models.EmailField(_('email address'),
+                              blank=False,
+                              unique=True,)
+
     bio = models.TextField('Биография', blank=True)
     role = models.CharField(
         max_length=16,
