@@ -5,12 +5,12 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import EmailValidator, ValidationError
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
-from rest_framework.serializers import CurrentUserDefault, ModelSerializer
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.serializers import ModelSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
@@ -103,7 +103,49 @@ class SignupSerializer(ModelSerializer):
         return user
 
 
+class ConfirmationCodeField(serializers.Field):
+    def to_representation(self, value):
+        return value
+
+    def to_internal_value(self, data):
+        return data
+
+
 class TokenSerializer(ModelSerializer):
+    confirmation_code = ConfirmationCodeField(source="password", write_only=True)
+    token = serializers.SerializerMethodField('get_token')
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('username', 'confirmation_code', 'token',)
+        extra_kwargs = {
+            'confirmation_code': {
+                'write_only': True,
+                'validators': [],
+            },
+            'username': {
+                'write_only': True,
+                'validators': [],
+            },
+        }
+
+    def get_token(self, obj):
+        refresh = RefreshToken.for_user(obj)
+
+        return str(refresh.access_token)
+
+    def validate(self, data):
+        username = data['username']
+        confirmation_code = data['password']
+        user = get_object_or_404(User, username=username)
+
+        # valid_password = user.check_password(confirmation_code)
+        valid_password = confirmation_code == user.password
+        if not valid_password:
+            message = f'invalid confirmation code value; check latest email'
+            raise serializers.ValidationError(message)
+
+        return data
+
+    def create(self, validated_data):
+        return User.objects.get(username=validated_data.get('username'))

@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -42,5 +43,13 @@ class SignupViewSet(PatchAsCreateViewSet):
 
 
 class TokenViewSet(PatchAsCreateViewSet):
-    queryset = User.objects.all()
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+    # queryset = User.objects.all()
     serializer_class = TokenSerializer
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        user = get_object_or_404(User, username=username)
+        return user

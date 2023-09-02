@@ -9,6 +9,5 @@ router.register(r'v1/auth/signup', SignupViewSet, basename='signup')
 router.register(r'v1/auth/token', TokenViewSet, basename='token')
 
 urlpatterns = [
-    # path('v1/', include('djoser.urls.jwt')),
     path('', include(router.urls)),
 ]
