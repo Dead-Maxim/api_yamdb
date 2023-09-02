@@ -11,6 +11,14 @@ YEAR_NOW = datetime.now().year
 TITLE_LEN = 100
 
 
+class Category(models.Model):
+    pass
+
+
+class Genre(models.Model):
+    pass
+
+
 class Title(models.Model):
     name = models.CharField(
         "Наименование произведения", max_length=TITLE_LEN
