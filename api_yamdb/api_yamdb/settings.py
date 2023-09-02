@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'extusers.apps.ExtusersConfig',
     'api.apps.ApiConfig',
+    'rewiews.apps.ReviewsConfig',
 ]
 
 MIDDLEWARE = [

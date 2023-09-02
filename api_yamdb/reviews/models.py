@@ -38,6 +38,7 @@ class Reviews(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        ordering = ['-created']
 
     def __str__(self):
         return self.text[:TEXT_LEN]
