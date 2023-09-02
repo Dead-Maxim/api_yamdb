@@ -1,7 +1,4 @@
-import uuid
-
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
@@ -19,7 +16,8 @@ class PatchAsCreateViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_200_OK, headers=headers)
 
     def perform_create(self, serializer):
         serializer.save()
@@ -35,7 +33,6 @@ class SignupViewSet(PatchAsCreateViewSet):
     permission_classes = [
         permissions.AllowAny,
     ]
-    # queryset = User.objects.all()
     serializer_class = SignupSerializer
 
     def get_queryset(self):
@@ -46,10 +43,8 @@ class TokenViewSet(PatchAsCreateViewSet):
     permission_classes = [
         permissions.AllowAny,
     ]
-    # queryset = User.objects.all()
     serializer_class = TokenSerializer
 
     def get_queryset(self):
-        username = self.kwargs['username']
-        user = get_object_or_404(User, username=username)
-        return user
+        return get_object_or_404(
+            User, username=self.kwargs['username'])

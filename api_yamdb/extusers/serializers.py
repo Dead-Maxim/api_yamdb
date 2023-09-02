@@ -7,7 +7,6 @@ from django.core.validators import EmailValidator, ValidationError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,10 +14,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
+
 class SignupSerializer(ModelSerializer):
     MAX_LEN_USERNAME = 150
     MAX_LEN_EMAIL = 254
-
 
     class Meta:
         model = User
@@ -41,7 +40,8 @@ class SignupSerializer(ModelSerializer):
 
         if len(value) > self.MAX_LEN_USERNAME:
             message = _(
-                f'Enter a string with length less or equal {self.MAX_LEN_USERNAME}.'
+                f'Enter a string with length '
+                f'less or equal {self.MAX_LEN_USERNAME}.'
             )
             raise serializers.ValidationError(message)
 
@@ -50,7 +50,8 @@ class SignupSerializer(ModelSerializer):
             username_validator(value)
         except ValidationError:
             message = _(
-                'Enter a valid username. This value may contain only letters, '
+                'Enter a valid username. '
+                'This value may contain only letters, '
                 'numbers, and @/./+/-/_ characters.'
             )
             raise serializers.ValidationError(message)
@@ -59,7 +60,8 @@ class SignupSerializer(ModelSerializer):
     def validate_email(self, value):
         if len(value) > self.MAX_LEN_EMAIL:
             message = _(
-                f'Enter a string with length less or equal {self.MAX_LEN_EMAIL}.'
+                f'Enter a string with length '
+                f'less or equal {self.MAX_LEN_EMAIL}.'
             )
             raise serializers.ValidationError(message)
 
@@ -112,7 +114,8 @@ class ConfirmationCodeField(serializers.Field):
 
 
 class TokenSerializer(ModelSerializer):
-    confirmation_code = ConfirmationCodeField(source="password", write_only=True)
+    confirmation_code = ConfirmationCodeField(
+        source="password", write_only=True)
     token = serializers.SerializerMethodField('get_token')
 
     class Meta:
@@ -142,7 +145,7 @@ class TokenSerializer(ModelSerializer):
         # valid_password = user.check_password(confirmation_code)
         valid_password = confirmation_code == user.password
         if not valid_password:
-            message = f'invalid confirmation code value; check latest email'
+            message = 'invalid confirmation code value; check latest email'
             raise serializers.ValidationError(message)
 
         return data
