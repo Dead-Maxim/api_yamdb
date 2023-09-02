@@ -6,9 +6,27 @@ from datetime import datetime
 User = get_user_model()
 
 TEXT_LEN = 50
+SLUG_LEN = 10
 MIN_YEAR = 1
 YEAR_NOW = datetime.now().year
 TITLE_LEN = 100
+
+
+class Genre(models.Model):
+    """Модель Жанров"""
+
+    name = models.CharField(
+        max_length=TEXT_LEN,
+        verbose_name="Название жанра",
+    )
+    slug = models.SlugField(
+        max_length=SLUG_LEN,
+        unique=True,
+        verbose_name="поле слаг_Жанр",
+    )
+
+    def __str__(self):
+        return self.slug
 
 
 class Title(models.Model):
@@ -48,6 +66,26 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:TEXT_LEN]
+
+
+class GenreTitle(models.Model):
+    """Связываем жанр и произведение"""
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='genres'
+    )
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        related_name='titles'
+    )
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        ordering = ['id']
 
 
 class Reviews(models.Model):
