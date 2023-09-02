@@ -12,6 +12,23 @@ YEAR_NOW = datetime.now().year
 TITLE_LEN = 100
 
 
+class Category(models.Model):
+    """Модель Категорий"""
+
+    name = models.CharField(
+        max_length=256,
+        verbose_name="Название категории",
+    )
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        verbose_name="поле слаг_Категория",
+    )
+
+    def __str__(self):
+        return self.slug
+
+
 class Genre(models.Model):
     """Модель Жанров"""
 
@@ -30,6 +47,7 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
+    """Модель произведения"""
     name = models.CharField(
         "Наименование произведения", max_length=TITLE_LEN
     )
