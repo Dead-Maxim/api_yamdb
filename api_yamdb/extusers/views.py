@@ -4,10 +4,8 @@ from rest_framework import mixins, pagination, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from .serializers import (
-    MeSerializer, SignupSerializer, TokenSerializer, UsersSerializer
-)
-from .permissions import AdminsHard, AuthUsers
+import extusers.serializers as serializers
+from extusers.permissions import AdminsHard, AuthUsers
 
 
 User = get_user_model()
@@ -18,7 +16,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = [
         AdminsHard,
     ]
-    serializer_class = UsersSerializer
+    serializer_class = serializers.UsersSerializer
     lookup_field = 'username'
     pagination_class = pagination.LimitOffsetPagination
 
@@ -32,7 +30,7 @@ class MeViewSet(
     permission_classes = [
         AuthUsers,
     ]
-    serializer_class = MeSerializer
+    serializer_class = serializers.MeSerializer
 
     def get_queryset(self):
         return get_object_or_404(User, pk=self.request.user.pk)
@@ -64,7 +62,7 @@ class SignupViewSet(PatchAsCreateViewSet):
     permission_classes = [
         permissions.AllowAny,
     ]
-    serializer_class = SignupSerializer
+    serializer_class = serializers.SignupSerializer
 
     def get_queryset(self):
         return None
@@ -74,7 +72,7 @@ class TokenViewSet(PatchAsCreateViewSet):
     permission_classes = [
         permissions.AllowAny,
     ]
-    serializer_class = TokenSerializer
+    serializer_class = serializers.TokenSerializer
 
     def get_queryset(self):
         return get_object_or_404(
