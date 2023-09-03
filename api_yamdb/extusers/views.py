@@ -4,11 +4,22 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from .serializers import MeSerializer, SignupSerializer, TokenSerializer
-from .permissions import AuthUsers
+from .serializers import (
+    MeSerializer, SignupSerializer, TokenSerializer, UsersSerializer
+)
+from .permissions import AdminsHard, AuthUsers
 
 
 User = get_user_model()
+
+
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = [
+        AdminsHard,
+    ]
+    serializer_class = UsersSerializer
+    lookup_field = 'username'
 
 
 class MeViewSet(
