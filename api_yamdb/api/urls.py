@@ -12,8 +12,8 @@ router.register(r'v1/auth/token', TokenViewSet, basename='token')
 router.register(r'v1/genres', GenreViewSet, basename="genres")
 router.register(r'v1/categories', CategoryViewSet, basename="categories")
 router.register(r'v1/titles', TitleViewSet, basename="titles")
-router.register(r'v1/reviews', ReviewsViewSet,
-                basename="REVIEWS")
+router.register(r'v1/titles/(?P<title_id>[^/.]+)/reviews', ReviewsViewSet,
+                basename="reviews")
 
 urlpatterns = [
     path('', include(router.urls)),

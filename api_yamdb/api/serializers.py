@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, CurrentUserDefault
 from reviews.models import Title, Genre, Category, Reviews
 
 
@@ -56,9 +56,11 @@ class ReviewsSerializer(ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
+        default=CurrentUserDefault()
     )
 
     class Meta:
         model = Reviews
         fields = '__all__'
         read_only_fields = ('title',)
+        extra_kwargs = {'score': {'required': True}}

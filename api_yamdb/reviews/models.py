@@ -115,10 +115,6 @@ class Reviews(models.Model):
         - title (ForeignKey): Ссылка на модель Title, к которой относится
         отзыв.
     """
-    id = models.IntegerField(
-        verbose_name='ID отзыва',
-        primary_key=True
-    )
     text = models.TextField(
         verbose_name='Текст отзыва',
     )
@@ -140,6 +136,10 @@ class Reviews(models.Model):
         verbose_name='Дата публикации отзыва',
         auto_now_add=True,
     )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews')
 
     class Meta:
         verbose_name = 'Отзыв'

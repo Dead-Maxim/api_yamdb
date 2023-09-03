@@ -51,4 +51,4 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return self.get_title().reviews.select_related("author")
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, post=self.get_title())
+        serializer.save(author=self.request.user, title=self.get_title())
