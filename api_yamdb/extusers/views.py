@@ -1,13 +1,32 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from .serializers import SignupSerializer, TokenSerializer
+from .serializers import MeSerializer, SignupSerializer, TokenSerializer
+from .permissions import AuthUsers
 
 
 User = get_user_model()
+
+
+class MeViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = User.objects.all()
+    permission_classes = [
+        AuthUsers,
+    ]
+    serializer_class = MeSerializer
+
+    def get_queryset(self):
+        return get_object_or_404(User, pk=self.request.user.pk)
+
+    def get_object(self):
+        return get_object_or_404(User, pk=self.request.user.pk)
 
 
 class PatchAsCreateViewSet(viewsets.GenericViewSet):

@@ -15,6 +15,31 @@ from rest_framework_simplejwt.tokens import RefreshToken
 User = get_user_model()
 
 
+class MeSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email',
+            'first_name', 'last_name', 'bio',
+            'role',
+        )
+        extra_kwargs = {
+            'role': {
+                'read_only': True,
+            },
+        }
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('name', instance.username)
+        instance.email = validated_data.get('name', instance.email)
+        instance.first_name = validated_data.get('name', instance.first_name)
+        instance.last_name = validated_data.get('name', instance.last_name)
+        instance.bio = validated_data.get('name', instance.bio)
+
+        instance.save()
+        return instance
+
+
 class SignupSerializer(ModelSerializer):
     MAX_LEN_USERNAME = 150
     MAX_LEN_EMAIL = 254
