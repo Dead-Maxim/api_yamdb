@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, permissions, status, viewsets
+from rest_framework import mixins, pagination, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
@@ -20,6 +20,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     ]
     serializer_class = UsersSerializer
     lookup_field = 'username'
+    pagination_class = pagination.LimitOffsetPagination
 
 
 class MeViewSet(
