@@ -124,6 +124,23 @@ class SignupSerializer(ModelSerializer):
         if users_count > 1:
             raise serializers.ValidationError(
                 'Плохая комбинация емайла и юзернейма')
+
+        users_count_username = User.objects.filter(
+            Q(username=username)
+        ).count()
+        users_count_email = User.objects.filter(
+            Q(email=email)
+        ).count()
+        if users_count_email == 1 and users_count_username == 0:
+            raise serializers.ValidationError(
+                'Нельзя на емайл регать другой юзернейм')
+
+        if users_count_username == 1:
+            user = User.objects.get(username=username)
+            if user.email != email:
+                raise serializers.ValidationError(
+                    'Нельзя на юзернейм регать другой емайл')
+
         return data
 
     def create(self, validated_data):
@@ -133,7 +150,6 @@ class SignupSerializer(ModelSerializer):
 
         try:
             user = User.objects.get(email=email)
-            user.username = username
             user.password = password
             user.save()
         except ObjectDoesNotExist:
@@ -182,7 +198,6 @@ class TokenSerializer(ModelSerializer):
         confirmation_code = data['password']
         user = get_object_or_404(User, username=username)
 
-        # valid_password = user.check_password(confirmation_code)
         valid_password = confirmation_code == user.password
         if not valid_password:
             message = 'invalid confirmation code value; check latest email'
