@@ -1,19 +1,19 @@
-from api.filters import TitleFilter
-from rest_framework.pagination import LimitOffsetPagination
 from django_filters import rest_framework as filters
 from rest_framework import viewsets
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 
-from reviews.models import Title, Genre, Category
-from extusers.permissions import (Admins,
-                                  AuthUsers,
-                                  Moderators,
-                                  SupervisorsHard)
+from api.filters import TitleFilter
 from api.serializers import (TitleSerializer,
                              GenreSerializer,
                              CategorySerializer,
                              ReviewsSerializer)
+from reviews.models import Title, Genre, Category
+from extusers.permissions import (Admins,
+                                  AuthUsers,
+                                  Moderators)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -80,4 +80,4 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         elif self.action in ('partial_update', 'destroy',):
             return (Moderators(),)
         else:
-            return (SupervisorsHard(),)
+            raise MethodNotAllowed(self.request.method)
