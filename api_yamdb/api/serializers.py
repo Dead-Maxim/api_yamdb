@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, CurrentUserDefault
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Title, Genre, Category, Review
+from reviews.models import Title, Genre, Category, Review, Comment
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -117,3 +117,17 @@ class ReviewSerializer(ModelSerializer):
         review = Review.objects.create(**validated_data)
 
         return review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Комментариев"""
+
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('author',)

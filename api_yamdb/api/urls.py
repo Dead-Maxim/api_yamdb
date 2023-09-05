@@ -3,7 +3,7 @@ from rest_framework.routers import SimpleRouter
 
 from extusers.views import MeViewSet, SignupViewSet, TokenViewSet, UsersViewSet
 from api.views import (CategoryViewSet, GenreViewSet, TitleViewSet,
-                       ReviewViewSet)
+                       ReviewViewSet, CommentViewSet)
 
 
 router = SimpleRouter()
@@ -15,6 +15,8 @@ router.register(r'v1/titles', TitleViewSet, basename="titles")
 router.register(r'v1/titles/(?P<title_id>[^/.]+)/reviews', ReviewViewSet,
                 basename="reviews")
 router.register(r'v1/users', UsersViewSet, basename="users")
+router.register(r'v1/titles/(?P<title_id>[^/.]+)/reviews/(?P<review_id>[^/.]+)/comments',
+                CommentViewSet, basename="comments")
 
 urlpatterns = [
     path(

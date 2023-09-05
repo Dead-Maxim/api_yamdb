@@ -12,6 +12,7 @@ SLUG_LEN = 10
 MIN_YEAR = 1
 YEAR_NOW = datetime.now().year
 TITLE_LEN = 100
+STR_LENGTH = 15
 
 
 class Category(models.Model):
@@ -111,6 +112,7 @@ class Review(models.Model):
     Атрибуты:
         - text (TextField): Текст отзыва.
         - author (ForeignKey): Ссылка на модель User, автора записи.
+        - score (IntegerField): Оценка от 1 до 10
         - pub_date (DateTimeField): Дата и время публикации отзыва.
         - title (ForeignKey): Ссылка на модель Title, к которой относится
         отзыв.
@@ -154,3 +156,38 @@ class Review(models.Model):
 
     def __str__(self):
         return self.text[:TEXT_LEN]
+
+
+class Comment(models.Model):
+    """ Комментарии к отзывам.
+        - text (TextField): Текст Комментария.
+        - author (ForeignKey): Ссылка на модель User, автора записи.
+        - pub_date (DateTimeField): Дата и время публикации комментария.
+        - review (ForeignKey): Ссылка на модель Review, к которой относится
+        комментарий.
+    """
+    text = models.TextField(
+        verbose_name='Текст комментария',
+    )
+    author = models.ForeignKey(
+        User,
+        verbose_name='username пользователя',
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации комментария',
+        auto_now_add=True,
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:STR_LENGTH]
