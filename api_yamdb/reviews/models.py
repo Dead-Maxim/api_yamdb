@@ -106,39 +106,51 @@ class GenreTitle(models.Model):
         ordering = ['id']
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     """Отзыв.
     Атрибуты:
-        - author (ForeignKey): Ссылка на модель User, автора записи.
         - text (TextField): Текст отзыва.
-        - created (DateTimeField): Дата и время публикации отзыва.
+        - author (ForeignKey): Ссылка на модель User, автора записи.
+        - pub_date (DateTimeField): Дата и время публикации отзыва.
         - title (ForeignKey): Ссылка на модель Title, к которой относится
         отзыв.
     """
+    text = models.TextField(
+        verbose_name='Текст отзыва',
+    )
     author = models.ForeignKey(
         User,
-        verbose_name='Автор отзыва',
+        verbose_name='username пользователя',
         on_delete=models.CASCADE,
         related_name='reviews',
     )
-    text = models.TextField(
-        verbose_name='Отзыв',
+    score = models.IntegerField(
+        verbose_name='Оценка от 1 до 10',
+        default=1,
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ]
     )
-    created = models.DateTimeField(
-        verbose_name='Дата публикации',
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации отзыва',
         auto_now_add=True,
     )
     title = models.ForeignKey(
         Title,
-        verbose_name='Произведение',
         on_delete=models.CASCADE,
-        related_name='reviews',
-    )
+        related_name='reviews')
 
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['-created']
+        ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_title_author'
+            )
+        ]
 
     def __str__(self):
         return self.text[:TEXT_LEN]

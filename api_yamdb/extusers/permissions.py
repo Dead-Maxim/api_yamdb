@@ -53,17 +53,9 @@ class Moderators(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        if not request.user.is_authenticated:
-            return False
-
-        user: User = request.user
         return (
-            user.is_superuser
-            or 'moderator' == user.role
-            or 'admin' == user.role
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
@@ -204,6 +196,7 @@ class Supervisors(permissions.BasePermission):
         return (
             user.is_superuser
         )
+
 
 class SupervisorsHard(permissions.BasePermission):
     """Supervisors"""
