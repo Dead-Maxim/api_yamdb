@@ -197,6 +197,7 @@ class Supervisors(permissions.BasePermission):
             user.is_superuser
         )
 
+
 class SupervisorsHard(permissions.BasePermission):
     """Supervisors"""
 
