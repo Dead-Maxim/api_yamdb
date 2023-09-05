@@ -4,7 +4,6 @@ from rest_framework.routers import SimpleRouter
 from extusers.views import MeViewSet, SignupViewSet, TokenViewSet, UsersViewSet
 from api.views import (CategoryViewSet, GenreViewSet, TitleViewSet,
                        ReviewViewSet)
-from extusers.views import SignupViewSet, TokenViewSet
 
 
 router = SimpleRouter()
