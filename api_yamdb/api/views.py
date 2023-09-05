@@ -15,7 +15,7 @@ from api.serializers import (TitleSerializer,
 from reviews.models import Title, Genre, Category, Review, Comment
 from extusers.permissions import (Admins,
                                   AuthUsers,
-                                  Moderators)
+                                  Moderators, SupervisorsHard)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -129,5 +129,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             return (AuthUsers(),)
         elif self.action in ('partial_update', 'destroy',):
             return (Moderators(),)
-        else:
+        elif self.action == 'update':
             raise MethodNotAllowed(self.request.method)
+        else:
+            return (SupervisorsHard(),)
