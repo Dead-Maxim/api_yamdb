@@ -2,15 +2,16 @@ from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.generics import get_object_or_404
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination)
 from rest_framework.permissions import AllowAny
 
 from api.filters import TitleFilter
 from api.serializers import (TitleSerializer,
                              GenreSerializer,
                              CategorySerializer,
-                             ReviewsSerializer)
-from reviews.models import Title, Genre, Category
+                             ReviewSerializer)
+from reviews.models import Title, Genre, Category, Review
 from extusers.permissions import (Admins,
                                   AuthUsers,
                                   Moderators)
@@ -43,10 +44,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
 
-class ReviewsViewSet(viewsets.ModelViewSet):
-    """ViewSet для модели Reviews."""
-    serializer_class = ReviewsSerializer
-    pagination_class = LimitOffsetPagination
+class ReviewViewSet(viewsets.ModelViewSet):
+    """ViewSet для модели Review."""
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete',]
 
     def get_title(self):

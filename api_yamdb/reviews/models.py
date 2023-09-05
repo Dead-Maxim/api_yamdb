@@ -106,7 +106,7 @@ class GenreTitle(models.Model):
         ordering = ['id']
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     """Отзыв.
     Атрибуты:
         - text (TextField): Текст отзыва.
@@ -145,6 +145,12 @@ class Reviews(models.Model):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_title_author'
+            )
+        ]
 
     def __str__(self):
         return self.text[:TEXT_LEN]
