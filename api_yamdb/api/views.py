@@ -1,9 +1,10 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from django.db.models import Avg
+from rest_framework.response import Response
 
 
 from api.filters import TitleFilter
@@ -24,6 +25,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (Admins,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -33,6 +41,13 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = (Admins,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
