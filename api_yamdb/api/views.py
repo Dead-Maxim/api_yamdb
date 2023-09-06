@@ -1,22 +1,18 @@
-from rest_framework import viewsets, filters, status
+from django.db.models import Avg
+from rest_framework import filters, status, viewsets
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
-from django.db.models import Avg
 from rest_framework.response import Response
 
-
 from api.filters import TitleFilter
-from api.serializers import (TitleSerializer,
-                             GenreSerializer,
-                             CategorySerializer,
-                             ReviewSerializer,
-                             CommentSerializer)
-from reviews.models import Title, Genre, Category, Review, Comment
-from extusers.permissions import (Admins,
-                                  AuthUsers,
-                                  Moderators, SupervisorsHard)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, TitleSerializer,
+                             ReviewSerializer,)
+from extusers.permissions import (Admins, AuthUsers, Moderators,
+                                  SupervisorsHard)
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -93,12 +89,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
         """
         if self.action in ('list', 'retrieve',):
             return (AllowAny(),)
-        elif self.action == 'create':
+        if self.action == 'create':
             return (AuthUsers(),)
-        elif self.action in ('partial_update', 'destroy',):
+        if self.action in ('partial_update', 'destroy',):
             return (Moderators(),)
-        else:
-            raise MethodNotAllowed(self.request.method)
+        raise MethodNotAllowed(self.request.method)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -140,11 +135,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         if self.action in ('list', 'retrieve',):
             return (AllowAny(),)
-        elif self.action == 'create':
+        if self.action == 'create':
             return (AuthUsers(),)
-        elif self.action in ('partial_update', 'destroy',):
+        if self.action in ('partial_update', 'destroy',):
             return (Moderators(),)
-        elif self.action == 'update':
+        if self.action == 'update':
             raise MethodNotAllowed(self.request.method)
-        else:
-            return (SupervisorsHard(),)
+        return (SupervisorsHard(),)

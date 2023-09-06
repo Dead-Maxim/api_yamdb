@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import (
-    filters, pagination, permissions, status, viewsets)
+from rest_framework import filters, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -25,13 +24,10 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=['get', 'patch',],
+        methods=['get', 'patch', ],
         permission_classes=(AuthUsersHard,)
     )
     def me(self, request):
-        # if not request.user.is_authenticated:
-        #     pass
-
         if request.method == 'PATCH':
             serializer = serializers.UsersSerializer(
                 request.user,
@@ -47,50 +43,6 @@ class UsersViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(
             serializer.data, status=status.HTTP_200_OK, headers=headers)
-
-    # def get_permissions(self):
-    #     """Разрешения согласно ТЗ в redoc
-#
-    #     - list (GET): Получить список всех пользователей.
-    #     Права доступа: Администратор.
-    #     - retrieve (GET): Получить пользователя по username.
-    #     Права доступа: Администратор.
-    #     - create (POST): Добавить нового пользователя.
-    #     Права доступа: Администратор.
-    #     - partial_update (PATCH): Изменить данные пользователя по username.
-    #     Права доступа: Администратор.
-    #     - destroy (DELETE): Удалить пользователя по username.
-    #     Права доступа: Администратор.
-    #     - update (PUT): не описан в доке. Не доступен никому
-    #     """
-        # if self.action in (
-        #         'list', 'retrieve',
-        #         'create' 'partial_update',
-        #         'destroy',
-        # ):
-        #     return (AdminsHard(),)
-        # else:
-        #     raise MethodNotAllowed(self.request.method)
-        # return (AdminsHard(),)
-
-
-# class MeViewSet(
-#     mixins.RetrieveModelMixin,
-#     mixins.UpdateModelMixin,
-#     viewsets.GenericViewSet
-# ):
-#     queryset = User.objects.all()
-#     permission_classes = [
-#         AuthUsers,
-#     ]
-#     serializer_class = serializers.MeSerializer
-#     http_method_names = ['get', 'patch',]
-#
-#     def get_queryset(self):
-#         return get_object_or_404(User, pk=self.request.user.pk)
-#
-#     def get_object(self):
-#         return get_object_or_404(User, pk=self.request.user.pk)
 
 
 class PatchAsCreateViewSet(viewsets.GenericViewSet):

@@ -1,9 +1,9 @@
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, CurrentUserDefault
+from rest_framework.serializers import CurrentUserDefault, ModelSerializer
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Title, Genre, Category, Review, Comment
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -104,9 +104,7 @@ class ReviewSerializer(ModelSerializer):
             )
             raise serializers.ValidationError(message)
 
-        review = Review.objects.create(**validated_data)
-
-        return review
+        return Review.objects.create(**validated_data)
 
 
 class CommentSerializer(serializers.ModelSerializer):
