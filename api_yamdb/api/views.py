@@ -10,11 +10,12 @@ from api.filters import TitleFilter
 from api.serializers import (TitleSerializer,
                              GenreSerializer,
                              CategorySerializer,
-                             ReviewSerializer)
-from reviews.models import Title, Genre, Category, Review
+                             ReviewSerializer,
+                             CommentSerializer)
+from reviews.models import Title, Genre, Category, Review, Comment
 from extusers.permissions import (Admins,
                                   AuthUsers,
-                                  Moderators)
+                                  Moderators, SupervisorsHard)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -49,7 +50,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
-    http_method_names = ['get', 'post', 'patch', 'delete',]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs.get("title_id"))
@@ -83,3 +84,52 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return (Moderators(),)
         else:
             raise MethodNotAllowed(self.request.method)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментариев"""
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_review(self):
+        return get_object_or_404(
+            Review,
+            pk=self.kwargs['review_id'],
+            title__id=self.kwargs['title_id'],
+        )
+
+    def get_queryset(self):
+        return self.get_review().comments.all()
+
+    def perform_create(self, serializer):
+        return serializer.save(
+            author=self.request.user, review=self.get_review()
+        )
+
+    def get_permissions(self):
+        """Разрешения согласно ТЗ в redoc
+
+        - list (GET): Получение списка всех комментариев.
+        Права доступа: Доступно без токена.
+        - retrieve (GET): Полуение комментария по id.
+        Права доступа: Доступно без токена.
+        - create (POST): Добавление нового комментария.
+        Права доступа: Аутентифицированные пользователи.
+        - partial_update (PATCH): Частичное обновление комментария по id.
+        Права доступа: Автор комментария, модератор или администратор.
+        - destroy (DELETE): Удаление комментария по id.
+        Права доступа: Автор комментария, модератор или администратор.
+        - update (PUT): не описан в доке. Не доступен никому
+        """
+        if self.action in ('list', 'retrieve',):
+            return (AllowAny(),)
+        elif self.action == 'create':
+            return (AuthUsers(),)
+        elif self.action in ('partial_update', 'destroy',):
+            return (Moderators(),)
+        elif self.action == 'update':
+            raise MethodNotAllowed(self.request.method)
+        else:
+            return (SupervisorsHard(),)
