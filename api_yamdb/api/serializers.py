@@ -1,9 +1,9 @@
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, CurrentUserDefault
+from rest_framework.serializers import CurrentUserDefault, ModelSerializer
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Title, Genre, Category, Review, Comment
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -53,16 +53,6 @@ class TitleSerializer(ModelSerializer):
         fields = "__all__"
 
 
-# class CurrentTitleDefault:
-#     requires_context = True
-#
-#     def __call__(self, serializer_field):
-#         return serializer_field.context['request'].data.get('title_id')
-#
-#     def __repr__(self):
-#         return '%s()' % self.__class__.__name__
-
-
 class ReviewSerializer(ModelSerializer):
     """Сериализатор модели Review."""
 
@@ -74,7 +64,7 @@ class ReviewSerializer(ModelSerializer):
 
     title = serializers.PrimaryKeyRelatedField(
         read_only=True,
-        default=0  # CurrentTitleDefault()
+        default=0
     )
 
     class Meta:
@@ -114,9 +104,7 @@ class ReviewSerializer(ModelSerializer):
             )
             raise serializers.ValidationError(message)
 
-        review = Review.objects.create(**validated_data)
-
-        return review
+        return Review.objects.create(**validated_data)
 
 
 class CommentSerializer(serializers.ModelSerializer):

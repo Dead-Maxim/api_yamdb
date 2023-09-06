@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, pagination, permissions, status, viewsets
+from rest_framework import filters, pagination, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 import extusers.serializers as serializers
-from extusers.permissions import AdminsHard, AuthUsers
+from extusers.permissions import AdminsHard, AuthUsersHard
 
 
 User = get_user_model()
@@ -13,30 +14,35 @@ User = get_user_model()
 
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = [
-        AdminsHard,
-    ]
     serializer_class = serializers.UsersSerializer
     lookup_field = 'username'
     pagination_class = pagination.LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = (AdminsHard,)
 
+    @action(
+        detail=False,
+        methods=['get', 'patch', ],
+        permission_classes=(AuthUsersHard,)
+    )
+    def me(self, request):
+        if request.method == 'PATCH':
+            serializer = serializers.UsersSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            if 'role' in serializer.validated_data:
+                serializer.validated_data.pop('role')
+            serializer.save()
 
-class MeViewSet(
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet
-):
-    queryset = User.objects.all()
-    permission_classes = [
-        AuthUsers,
-    ]
-    serializer_class = serializers.MeSerializer
-
-    def get_queryset(self):
-        return get_object_or_404(User, pk=self.request.user.pk)
-
-    def get_object(self):
-        return get_object_or_404(User, pk=self.request.user.pk)
+        serializer = serializers.UsersSerializer(request.user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_200_OK, headers=headers)
 
 
 class PatchAsCreateViewSet(viewsets.GenericViewSet):

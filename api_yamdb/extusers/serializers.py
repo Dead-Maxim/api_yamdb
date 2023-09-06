@@ -26,6 +26,9 @@ class UsersSerializer(ModelSerializer):
 
 
 class MeSerializer(ModelSerializer):
+    MAX_LEN_USERNAME = 150
+    MAX_LEN_EMAIL = 254
+
     class Meta:
         model = User
         fields = (
@@ -37,7 +40,57 @@ class MeSerializer(ModelSerializer):
             'role': {
                 'read_only': True,
             },
+            'username': {
+                'validators': []
+            },
+            'email': {
+                'validators': []
+            },
         }
+
+    def validate_username(self, value):
+        if value is None:
+            return value
+
+        if len(value) > self.MAX_LEN_USERNAME:
+            message = _(
+                f'Enter a string with length '
+                f'less or equal {self.MAX_LEN_USERNAME}.'
+            )
+            raise serializers.ValidationError(message)
+
+        username_validator = UnicodeUsernameValidator()
+        try:
+            username_validator(value)
+        except ValidationError:
+            message = _(
+                'Enter a valid username. '
+                'This value may contain only letters, '
+                'numbers, and @/./+/-/_ characters.'
+            )
+            raise serializers.ValidationError(message)
+        return value
+
+    def validate_email(self, value):
+        if value is None:
+            return value
+
+        if len(value) > self.MAX_LEN_EMAIL:
+            message = _(
+                f'Enter a string with length '
+                f'less or equal {self.MAX_LEN_EMAIL}.'
+            )
+            raise serializers.ValidationError(message)
+
+        email_validator = EmailValidator()
+        try:
+            email_validator(value)
+        except ValidationError:
+            message = _(
+                'Enter a valid email.'
+            )
+            raise serializers.ValidationError(message)
+        return value
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get(

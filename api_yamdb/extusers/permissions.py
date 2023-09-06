@@ -23,7 +23,7 @@ class AuthUsers(permissions.BasePermission):
     """Аутентифицированный пользователь (user)
 
     Единственная проверка - что прошёл аутентификацию.
-    На SAFE_METHODS проверки нет,
+    На SAFE_METHODS запрета вовсе нет,
     так как некоторые добавления ему должны быть доступны.
     Для объектов проверка на авторство.
     """
@@ -41,6 +41,25 @@ class AuthUsers(permissions.BasePermission):
                 request.user.is_authenticated
                 and obj.author == request.user
             )
+        )
+
+
+class AuthUsersHard(permissions.BasePermission):
+    """Аутентифицированный пользователь (user)
+
+    Единственная проверка - что прошёл аутентификацию.
+    На SAFE_METHODS разрешений нет,
+    так как некоторые добавления ему должны быть доступны.
+    Для объектов проверка на авторство.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            request.user.is_authenticated
+            and obj.author == request.user
         )
 
 
