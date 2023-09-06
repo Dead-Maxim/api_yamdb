@@ -28,6 +28,11 @@ class Category(models.Model):
         verbose_name="поле слаг_Категория",
     )
 
+    class Meta:
+        verbose_name = "Категория произведения"
+        verbose_name_plural = "Категории"
+        ordering = ("id",)
+
     def __str__(self):
         return self.slug
 
@@ -44,6 +49,11 @@ class Genre(models.Model):
         unique=True,
         verbose_name="поле слаг_Жанр",
     )
+
+    class Meta:
+        verbose_name = "Жанр произведения"
+        verbose_name_plural = "Жанры"
+        ordering = ("id",)
 
     def __str__(self):
         return self.slug
@@ -83,7 +93,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = "Произведение"
         verbose_name_plural = "Произведения"
-        ordering = ("name",)
+        ordering = ("id",)
 
     def __str__(self):
         return self.name[:TEXT_LEN]
