@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from extusers.views import MeViewSet, SignupViewSet, TokenViewSet, UsersViewSet
+from extusers.views import SignupViewSet, TokenViewSet, UsersViewSet
 from api.views import (CategoryViewSet, GenreViewSet, TitleViewSet,
                        ReviewViewSet, CommentViewSet)
 
@@ -19,15 +19,17 @@ router.register(r'v1/titles/(?P<title_id>[^/.]+)/reviews/(?P<review_id>[^/.]+)/c
                 CommentViewSet, basename="comments")
 
 urlpatterns = [
-    path(
-        'v1/users/me/',
-        MeViewSet.as_view(
-            {
-                'get': 'retrieve',
-                'patch': 'update',
-            }
-        ),
-        name='me'
-    ),
+    # path(
+        # 'v1/users/me/',
+        # MeViewSet
+        # .as_view(
+            # {
+            #     'get': 'retrieve',
+            #     'patch': 'update',
+            # }
+        # )
+        # ,
+        # name='me'
+    # ),
     path('', include(router.urls)),
 ]

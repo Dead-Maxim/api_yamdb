@@ -53,16 +53,6 @@ class TitleSerializer(ModelSerializer):
         fields = "__all__"
 
 
-# class CurrentTitleDefault:
-#     requires_context = True
-#
-#     def __call__(self, serializer_field):
-#         return serializer_field.context['request'].data.get('title_id')
-#
-#     def __repr__(self):
-#         return '%s()' % self.__class__.__name__
-
-
 class ReviewSerializer(ModelSerializer):
     """Сериализатор модели Review."""
 
@@ -74,7 +64,7 @@ class ReviewSerializer(ModelSerializer):
 
     title = serializers.PrimaryKeyRelatedField(
         read_only=True,
-        default=0  # CurrentTitleDefault()
+        default=0
     )
 
     class Meta:
