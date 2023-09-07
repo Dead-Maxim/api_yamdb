@@ -62,16 +62,7 @@ class Command(BaseCommand):
         if not options['need_no_purge']:
             self.purge_db()
 
-        # for poll_id in options['poll_ids']:
-        #     try:
-        #         poll = Poll.objects.get(pk=poll_id)
-        #     except Poll.DoesNotExist:
-        #         raise CommandError('Poll "%s" does not exist' % poll_id)
-
-        #     poll.opened = False
-        #     poll.save()
-
-        #     self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
+        self.load_db(options['need_no_purge'])
 
     def check_csv_files(self):
         """Check csv files presence"""
@@ -134,3 +125,50 @@ class Command(BaseCommand):
 
         User.objects.filter(is_superuser=False).delete()
         self.stdout.write('User model (is_superuser=False) is purged')
+
+    def load_db(self, need_no_purge):
+        """Заливка данных из csv-шек в бд
+
+        Льём строго в определённом порядке (от юзверей и словарей до комментов).
+        Юзверей upsert-им в любом случае, всё остальное - insert
+        при need_no_purge == False и insert при True.
+        """
+
+        # Users
+        pass
+
+        # Category
+        if (need_no_purge):
+            pass
+        else:
+            pass
+
+        # Genre
+        if (need_no_purge):
+            pass
+        else:
+            pass
+
+        # Title
+        if (need_no_purge):
+            pass
+        else:
+            pass
+
+        # GenreTitle
+        if (need_no_purge):
+            pass
+        else:
+            pass
+
+        # Review
+        if (need_no_purge):
+            pass
+        else:
+            pass
+
+        # Comment
+        if (need_no_purge):
+            pass
+        else:
+            pass
