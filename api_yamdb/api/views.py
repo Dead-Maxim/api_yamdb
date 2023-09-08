@@ -10,8 +10,7 @@ from api.filters import TitleFilter
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, TitleSerializer,
                              ReviewSerializer,)
-from extusers.permissions import (Admins, AuthUsers, Moderators,
-                                  SupervisorsHard)
+from extusers.permissions import Admins, AuthUsers, Moderators
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
