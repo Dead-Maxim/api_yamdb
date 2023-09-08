@@ -9,8 +9,6 @@ User = get_user_model()
 
 TEXT_LEN = 50
 SLUG_LEN = 10
-MIN_YEAR = 1
-YEAR_NOW = datetime.now().year
 TITLE_LEN = 100
 STR_LENGTH = 15
 
@@ -53,7 +51,6 @@ class Genre(models.Model):
     class Meta:
         verbose_name = "Жанр произведения"
         verbose_name_plural = "Жанры"
-        ordering = ("id",)
 
     def __str__(self):
         return self.slug
@@ -68,8 +65,8 @@ class Title(models.Model):
         "Год выпуска произведения",
         db_index=True,
         validators=[
-            MinValueValidator(MIN_YEAR),
-            MaxValueValidator(YEAR_NOW),
+            MinValueValidator(1),
+            MaxValueValidator(datetime.now().year),
         ],
     )
     description = models.TextField(

@@ -102,6 +102,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = (Moderators,)
 
     def get_review(self):
         return get_object_or_404(
@@ -117,28 +118,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         return serializer.save(
             author=self.request.user, review=self.get_review()
         )
-
-    def get_permissions(self):
-        """Разрешения согласно ТЗ в redoc
-
-        - list (GET): Получение списка всех комментариев.
-        Права доступа: Доступно без токена.
-        - retrieve (GET): Полуение комментария по id.
-        Права доступа: Доступно без токена.
-        - create (POST): Добавление нового комментария.
-        Права доступа: Аутентифицированные пользователи.
-        - partial_update (PATCH): Частичное обновление комментария по id.
-        Права доступа: Автор комментария, модератор или администратор.
-        - destroy (DELETE): Удаление комментария по id.
-        Права доступа: Автор комментария, модератор или администратор.
-        - update (PUT): не описан в доке. Не доступен никому
-        """
-        if self.action in ('list', 'retrieve',):
-            return (AllowAny(),)
-        if self.action == 'create':
-            return (AuthUsers(),)
-        if self.action in ('partial_update', 'destroy',):
-            return (Moderators(),)
-        if self.action == 'update':
-            raise MethodNotAllowed(self.request.method)
-        return (SupervisorsHard(),)
