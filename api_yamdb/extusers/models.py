@@ -19,3 +19,16 @@ class CustomUser(AbstractUser):
         choices=Roles.choices,
         default=Roles.USER,
     )
+
+    def is_admin(self):
+        return (
+            self.is_superuser
+            or 'admin' == self.role
+        )
+
+    def is_moderator(self):
+        return (
+            self.is_superuser
+            or 'admin' == self.role
+            or 'moderator' == self.role
+        )
