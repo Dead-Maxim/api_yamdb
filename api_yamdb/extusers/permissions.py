@@ -22,10 +22,9 @@ class Anonyms(permissions.BasePermission):
 class AuthUsers(permissions.BasePermission):
     """Аутентифицированный пользователь (user)
 
-    Единственная проверка - что прошёл аутентификацию.
-    На SAFE_METHODS запрета вовсе нет,
-    так как некоторые добавления ему должны быть доступны.
-    Для объектов проверка на авторство.
+    Прошёл аутентификацию или SAFE_METHODS.
+    Для объектов в плюс к авторизованности
+    в случае не SAFE_METHODS - И проверка на авторство.
     """
 
     def has_permission(self, request, view):
@@ -48,27 +47,23 @@ class AuthUsersHard(permissions.BasePermission):
     """Аутентифицированный пользователь (user)
 
     Единственная проверка - что прошёл аутентификацию.
-    На SAFE_METHODS разрешений нет,
-    так как некоторые добавления ему должны быть доступны.
-    Для объектов проверка на авторство.
+    Author-ство объекта и SAFE_METHODS не имеют значения.
     """
 
     def has_permission(self, request, view):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.user.is_authenticated
-            and obj.author == request.user
-        )
+        return request.user.is_authenticated
 
 
 class Moderators(permissions.BasePermission):
-    """Модератор (moderator)
+    """Модератор или author объекта
 
     Проверка - прошёл аутентификацию,
-    и юзеру выставлена роль moderator и выше,
-    или он вообще supervisor, или автор объекта.
+    и юзеру выставлен флаг is_moderator
+    (роль мадератор и выше, или он supervisor),
+    или author объекта, или SAFE_METHODS.
     """
 
     def has_permission(self, request, view):
@@ -81,159 +76,148 @@ class Moderators(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
         return (
-            user.is_superuser
-            or 'moderator' == user.role
-            or 'admin' == user.role
-            or obj.author == request.user
+            user.is_moderator()
+            or obj.author == user
         )
 
 
 class ModeratorsHard(permissions.BasePermission):
-    """Модератор (moderator)
+    """Модератор
 
     Проверка - прошёл аутентификацию,
-    и юзеру выставлена роль moderator и выше,
-    или он вообще supervisor, или автор объекта.
+    и юзеру выставлен флаг is_moderator
+    (роль мадератор и выше, или он supervisor).
+    Author-ство объекта и SAFE_METHODS не имеют значения.
     """
 
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'moderator' == user.role
-            or 'admin' == user.role
-        )
+        return user.is_moderator()
 
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'moderator' == user.role
-            or 'admin' == user.role
-        )
+        return user.is_moderator()
 
 
 class Admins(permissions.BasePermission):
-    """Администратор (admin)
+    """Администратор или author объекта
 
     Проверка - прошёл аутентификацию,
-    и юзеру выставлена роль admin,
-    или он вообще supervisor, или автор объекта.
+    и юзеру выставлен флаг is_admin
+    (роль admin, или он supervisor),
+    или author объекта, или SAFE_METHODS.
     """
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'admin' == user.role
-        )
+        return user.is_admin()
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'admin' == user.role
-            or obj.author == request.user
-        )
+        return user.is_admin()
 
 
 class AdminsHard(permissions.BasePermission):
-    """Администратор (admin)
+    """Администратор
 
     Проверка - прошёл аутентификацию,
-    и юзеру выставлена роль admin,
-    или он вообще supervisor, или автор объекта.
+    и юзеру выставлен флаг is_admin
+    (роль admin, или он supervisor).
+    Author-ство объекта и SAFE_METHODS не имеют значения.
     """
 
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'admin' == user.role
-        )
+        return user.is_admin()
 
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-            or 'admin' == user.role
-        )
+        return user.is_admin()
 
 
 class Supervisors(permissions.BasePermission):
-    """Supervisors"""
+    """Supervisors
+
+    или author объекта, или SAFE_METHODS.
+    """
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-        )
+        return user.is_superuser
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-        )
+        return user.is_superuser
 
 
 class SupervisorsHard(permissions.BasePermission):
-    """Supervisors"""
+    """Supervisors
+
+    Author-ство объекта и SAFE_METHODS не имеют значения.
+    """
 
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-        )
+        return user.is_superuser
 
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated:
+        user: User = request.user
+
+        if not user.is_authenticated:
             return False
 
-        user: User = request.user
-        return (
-            user.is_superuser
-        )
+        return user.is_superuser
